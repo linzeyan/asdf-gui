@@ -25,8 +25,7 @@ Download the latest release for your platform from the [Releases](../../releases
 
 | Platform | File |
 |---|---|
-| macOS (Apple Silicon) | `asdf-gui_x.x.x_arm64.dmg` |
-| macOS (Intel) | `asdf-gui_x.x.x_amd64.dmg` |
+| macOS (Universal) | `asdf-gui_x.x.x_universal.dmg` |
 | Linux (x86_64) | `.deb` / `.AppImage` / `.rpm` |
 | Linux (arm64) | `.deb` / `.AppImage` / `.rpm` |
 | Windows (x86_64) | `.msi` / `-setup.exe` |

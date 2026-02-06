@@ -3,7 +3,7 @@
 dev:
 	pnpm tauri dev
 
-build: lint
+build: test
 	pnpm tauri build
 
 lint: format-check
@@ -18,7 +18,7 @@ format-check:
 	pnpm exec prettier --check "src/**/*.{ts,tsx,css,json}"
 	cd src-tauri && cargo fmt --check
 
-test:
+test: lint
 	pnpm exec vitest run
 	cd src-tauri && cargo test
 

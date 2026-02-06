@@ -185,3 +185,136 @@ pub fn parse_env(stdout: &str) -> Vec<EnvVar> {
         })
         .collect()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parse_current() {
+        let input = "nodejs          20.11.0         /home/user/.tool-versions\npython          3.12.1          Not installed\n";
+        let result = parse_current(input).unwrap();
+        assert_eq!(result.len(), 2);
+        assert_eq!(result[0].name, "nodejs");
+        assert_eq!(result[0].version, "20.11.0");
+        assert!(result[0].installed);
+        assert_eq!(result[1].name, "python");
+        assert_eq!(result[1].version, "3.12.1");
+        assert!(!result[1].installed);
+    }
+
+    #[test]
+    fn test_parse_current_empty() {
+        let result = parse_current("").unwrap();
+        assert!(result.is_empty());
+    }
+
+    #[test]
+    fn test_parse_plugin_list() {
+        let input = "nodejs  https://github.com/asdf-vm/asdf-nodejs.git  main\npython\n";
+        let result = parse_plugin_list(input).unwrap();
+        assert_eq!(result.len(), 2);
+        assert_eq!(result[0].name, "nodejs");
+        assert_eq!(
+            result[0].url.as_deref(),
+            Some("https://github.com/asdf-vm/asdf-nodejs.git")
+        );
+        assert_eq!(result[0].git_ref.as_deref(), Some("main"));
+        assert_eq!(result[1].name, "python");
+        assert!(result[1].url.is_none());
+    }
+
+    #[test]
+    fn test_parse_plugin_list_all() {
+        let input = "nodejs  https://github.com/asdf-vm/asdf-nodejs.git\npython  https://github.com/asdf-community/asdf-python.git\n";
+        let result = parse_plugin_list_all(input).unwrap();
+        assert_eq!(result.len(), 2);
+        assert_eq!(result[0].name, "nodejs");
+        assert!(result[0].url.contains("asdf-nodejs"));
+    }
+
+    #[test]
+    fn test_parse_list_installed() {
+        let input = "  18.17.0\n *20.11.0\n  21.0.0\n";
+        let result = parse_list_installed(input);
+        assert_eq!(result.len(), 3);
+        assert_eq!(result[0], ("18.17.0".to_string(), false));
+        assert_eq!(result[1], ("20.11.0".to_string(), true));
+        assert_eq!(result[2], ("21.0.0".to_string(), false));
+    }
+
+    #[test]
+    fn test_parse_list_all() {
+        let input = "18.0.0\n18.1.0\n20.0.0\n";
+        let result = parse_list_all(input);
+        assert_eq!(result, vec!["18.0.0", "18.1.0", "20.0.0"]);
+    }
+
+    #[test]
+    fn test_parse_list_all_filters_blanks() {
+        let input = "18.0.0\n\n20.0.0\n  \n";
+        let result = parse_list_all(input);
+        assert_eq!(result, vec!["18.0.0", "20.0.0"]);
+    }
+
+    #[test]
+    fn test_parse_latest_all() {
+        let input = "nodejs  20.11.0  20.11.0\npython  3.12.1\n";
+        let result = parse_latest_all(input).unwrap();
+        assert_eq!(result.len(), 2);
+        assert_eq!(result[0].name, "nodejs");
+        assert_eq!(result[0].latest, "20.11.0");
+        assert!(result[0].up_to_date);
+        assert_eq!(result[1].name, "python");
+        assert_eq!(result[1].latest, "3.12.1");
+        assert!(result[1].installed_version.is_none());
+        assert!(!result[1].up_to_date);
+    }
+
+    #[test]
+    fn test_parse_shim_versions() {
+        let input = "nodejs 20.11.0\nnodejs 18.17.0\n";
+        let result = parse_shim_versions(input);
+        assert_eq!(result.len(), 2);
+        assert_eq!(result[0].plugin, "nodejs");
+        assert_eq!(result[0].version, "20.11.0");
+    }
+
+    #[test]
+    fn test_parse_tool_versions() {
+        let input = "nodejs 20.11.0\npython 3.12.1 3.11.7\n# comment line\nruby 3.3.0\n";
+        let result = parse_tool_versions(input);
+        assert_eq!(result.len(), 3);
+        assert_eq!(result[0].tool, "nodejs");
+        assert_eq!(result[0].versions, vec!["20.11.0"]);
+        assert_eq!(result[1].tool, "python");
+        assert_eq!(result[1].versions, vec!["3.12.1", "3.11.7"]);
+        assert_eq!(result[2].tool, "ruby");
+    }
+
+    #[test]
+    fn test_parse_tool_versions_inline_comment() {
+        let input = "nodejs 20.11.0 # LTS\n";
+        let result = parse_tool_versions(input);
+        assert_eq!(result.len(), 1);
+        assert_eq!(result[0].versions, vec!["20.11.0"]);
+    }
+
+    #[test]
+    fn test_parse_env() {
+        let input = "ASDF_DIR=/home/user/.asdf\nASDF_DATA_DIR=/home/user/.asdf\nPATH=/usr/bin\n";
+        let result = parse_env(input);
+        assert_eq!(result.len(), 3);
+        assert_eq!(result[0].key, "ASDF_DIR");
+        assert_eq!(result[0].value, "/home/user/.asdf");
+    }
+
+    #[test]
+    fn test_parse_env_with_equals_in_value() {
+        let input = "FOO=bar=baz\n";
+        let result = parse_env(input);
+        assert_eq!(result.len(), 1);
+        assert_eq!(result[0].key, "FOO");
+        assert_eq!(result[0].value, "bar=baz");
+    }
+}

@@ -62,25 +62,23 @@ jobs:
       - run: pnpm install
 
       - uses: tauri-apps/tauri-action@v0
-        id: tauri
         with:
           args: ${{ matrix.args }}
 
-      - name: Rename artifacts
+      - name: Collect and rename artifacts
         shell: bash
         run: |
           mkdir -p artifacts
-          echo '${{ steps.tauri.outputs.artifactPaths }}' | jq -r '.[]' | while IFS= read -r file; do
-            # Trim Windows carriage return
-            file="${file//$'\r'/}"
-            # Skip directories (.app bundles on macOS)
-            [ -d "$file" ] && continue
-            # Skip if file doesn't exist
-            [ ! -f "$file" ] && continue
+          find src-tauri/target -type f \
+            \( -name "*.dmg" -o -name "*.deb" -o -name "*.AppImage" -o -name "*.rpm" -o -name "*.msi" -o -name "*-setup.exe" \) \
+            | while IFS= read -r file; do
             name=$(basename "$file")
             new_name=$(echo "$name" | sed 's/aarch64/arm64/g; s/x86_64/amd64/g; s/x64/amd64/g; s/_en-US\.msi/.msi/g')
             cp "$file" "artifacts/$new_name"
+            echo "  $name -> $new_name"
           done
+          echo "--- Artifacts ---"
+          ls -lh artifacts/
 
       - uses: actions/upload-artifact@v4
         with:

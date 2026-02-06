@@ -3,8 +3,28 @@ name: CI
 on:
   push:
     branches: [main]
+    paths:
+      - "src/**"
+      - "src-tauri/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "vite.config.ts"
+      - "tsconfig*.json"
+      - "eslint.config.js"
+      - ".prettierrc"
+      - ".github/workflows/ci.yml"
   pull_request:
     branches: [main]
+    paths:
+      - "src/**"
+      - "src-tauri/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "vite.config.ts"
+      - "tsconfig*.json"
+      - "eslint.config.js"
+      - ".prettierrc"
+      - ".github/workflows/ci.yml"
 
 jobs:
   ci:

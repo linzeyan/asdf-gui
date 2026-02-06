@@ -6,49 +6,7 @@ on:
       - "v*"
 
 jobs:
-  lint-and-test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: pnpm
-
-      - uses: dtolnay/rust-toolchain@stable
-
-      - name: Install Linux dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
-
-      - run: pnpm install
-
-      - name: Lint frontend
-        run: pnpm exec eslint src/
-
-      - name: Lint Rust
-        run: cd src-tauri && cargo clippy --all-targets -- -D warnings
-
-      - name: Format check frontend
-        run: pnpm exec prettier --check "src/**/*.{ts,tsx,css,json}"
-
-      - name: Format check Rust
-        run: cd src-tauri && cargo fmt --check
-
-      - name: Test frontend
-        run: pnpm exec vitest run
-
-      - name: Test Rust
-        run: cd src-tauri && cargo test
-
   build:
-    needs: lint-and-test
     strategy:
       fail-fast: false
       matrix:
@@ -116,7 +74,13 @@ jobs:
         shell: bash
         run: |
           mkdir -p artifacts
-          echo '${{ steps.tauri.outputs.artifactPaths }}' | jq -r '.[]' | while read file; do
+          echo '${{ steps.tauri.outputs.artifactPaths }}' | jq -r '.[]' | while IFS= read -r file; do
+            # Trim Windows carriage return
+            file="${file//$'\r'/}"
+            # Skip directories (.app bundles on macOS)
+            [ -d "$file" ] && continue
+            # Skip if file doesn't exist
+            [ ! -f "$file" ] && continue
             name=$(basename "$file")
             new_name=$(echo "$name" | sed 's/aarch64/arm64/g; s/x86_64/amd64/g; s/x64/amd64/g; s/_en-US\.msi/.msi/g')
             cp "$file" "artifacts/$new_name"

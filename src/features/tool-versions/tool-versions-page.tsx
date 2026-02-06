@@ -103,7 +103,7 @@ export function ToolVersionsPage() {
     setIsSaving(true);
     try {
       await commands.writeToolVersions(filePath, entries);
-      toast.success(`Saved ${filePath}`);
+      toast.success(t("toolVersions.fileSaved", { path: filePath }));
       setIsDirty(false);
     } catch (e) {
       toast.error(String(e));
@@ -117,7 +117,7 @@ export function ToolVersionsPage() {
     setInstallingKey(key);
     try {
       await commands.installVersion(plugin, version, false, null, () => {});
-      toast.success(`${plugin}@${version} installed`);
+      toast.success(t("versions.versionInstalled", { name: plugin, version }));
       // Refresh installed versions
       const versions = await commands
         .listInstalled(plugin)
@@ -160,64 +160,48 @@ export function ToolVersionsPage() {
           <TabsTrigger value="custom">{t("toolVersions.custom")}</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="Local">
-          <ToolVersionsEditor
-            entries={entries}
-            plugins={plugins}
-            installedPlugins={installedPlugins}
-            installedVersionsMap={installedVersionsMap}
-            isLoading={isLoading}
-            filePath={filePath}
-            onChange={handleChange}
-            onInstallVersion={handleInstallVersion}
-            installingKey={installingKey}
-          />
-        </TabsContent>
-
-        <TabsContent value="Home">
-          <ToolVersionsEditor
-            entries={entries}
-            plugins={plugins}
-            installedPlugins={installedPlugins}
-            installedVersionsMap={installedVersionsMap}
-            isLoading={isLoading}
-            filePath={filePath}
-            onChange={handleChange}
-            onInstallVersion={handleInstallVersion}
-            installingKey={installingKey}
-          />
-        </TabsContent>
-
-        <TabsContent value="custom" className="space-y-4">
-          <div className="flex gap-2">
-            <Input
-              placeholder="/path/to/.tool-versions"
-              value={customPath}
-              onChange={(e) => setCustomPath(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleLoadCustom();
-              }}
+        {/* Shared editor rendered in whichever tab is active */}
+        {(() => {
+          const editor = (
+            <ToolVersionsEditor
+              entries={entries}
+              plugins={plugins}
+              installedPlugins={installedPlugins}
+              installedVersionsMap={installedVersionsMap}
+              isLoading={isLoading}
+              filePath={filePath}
+              onChange={handleChange}
+              onInstallVersion={handleInstallVersion}
+              installingKey={installingKey}
             />
-            <Button
-              variant="outline"
-              onClick={handleLoadCustom}
-              disabled={!customPath.trim()}
-            >
-              Load
-            </Button>
-          </div>
-          <ToolVersionsEditor
-            entries={entries}
-            plugins={plugins}
-            installedPlugins={installedPlugins}
-            installedVersionsMap={installedVersionsMap}
-            isLoading={isLoading}
-            filePath={filePath}
-            onChange={handleChange}
-            onInstallVersion={handleInstallVersion}
-            installingKey={installingKey}
-          />
-        </TabsContent>
+          );
+          return (
+            <>
+              <TabsContent value="Local">{editor}</TabsContent>
+              <TabsContent value="Home">{editor}</TabsContent>
+              <TabsContent value="custom" className="space-y-4">
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="/path/to/.tool-versions"
+                    value={customPath}
+                    onChange={(e) => setCustomPath(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleLoadCustom();
+                    }}
+                  />
+                  <Button
+                    variant="outline"
+                    onClick={handleLoadCustom}
+                    disabled={!customPath.trim()}
+                  >
+                    Load
+                  </Button>
+                </div>
+                {editor}
+              </TabsContent>
+            </>
+          );
+        })()}
       </Tabs>
     </div>
   );

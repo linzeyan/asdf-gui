@@ -56,7 +56,11 @@
     "gitUrl": "Git URL",
     "updateAll": "Update All",
     "removeConfirm": "Are you sure you want to remove the plugin \"{{name}}\"? This will also remove all installed versions.",
-    "viewVersions": "View Versions"
+    "viewVersions": "View Versions",
+    "pluginAdded": "Plugin \"{{name}}\" added",
+    "pluginRemoved": "Plugin \"{{name}}\" removed",
+    "pluginUpdated": "Plugin \"{{name}}\" updated",
+    "allPluginsUpdated": "All plugins updated"
   },
   "versions": {
     "title": "Versions",
@@ -69,7 +73,11 @@
     "installLatest": "Install Latest",
     "latestVersions": "Latest Versions",
     "installing": "Installing...",
-    "current": "Current"
+    "current": "Current",
+    "versionInstalled": "{{name}}@{{version}} installed",
+    "versionUninstalled": "{{name}}@{{version}} uninstalled",
+    "versionSet": "{{name}} set to {{version}} ({{scope}})",
+    "installFailed": "Installation failed for {{name}}@{{version}}"
   },
   "toolVersions": {
     "title": ".tool-versions",
@@ -81,7 +89,8 @@
     "validation": {
       "pluginNotInstalled": "Plugin not installed",
       "versionNotInstalled": "Version not installed"
-    }
+    },
+    "fileSaved": "Saved {{path}}"
   },
   "shims": {
     "title": "Shims",
@@ -91,7 +100,8 @@
     "providedBy": "Provided By",
     "reshim": "Reshim",
     "selectPlugin": "Select plugin",
-    "selectVersion": "Select version"
+    "selectVersion": "Select version",
+    "reshimSuccess": "Reshimmed {{name}}@{{version}}"
   },
   "info": {
     "title": "Info",

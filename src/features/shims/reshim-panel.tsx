@@ -49,7 +49,12 @@ export function ReshimPanel() {
     setIsLoading(true);
     try {
       await commands.reshim(selectedPlugin, selectedVersion);
-      toast.success(`Reshimmed ${selectedPlugin}@${selectedVersion}`);
+      toast.success(
+        t("shims.reshimSuccess", {
+          name: selectedPlugin,
+          version: selectedVersion,
+        }),
+      );
     } catch (e) {
       toast.error(String(e));
     } finally {

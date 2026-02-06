@@ -56,7 +56,11 @@
     "gitUrl": "Git URL",
     "updateAll": "全部更新",
     "removeConfirm": "確定要移除外掛「{{name}}」嗎？這也會移除所有已安裝的版本。",
-    "viewVersions": "檢視版本"
+    "viewVersions": "檢視版本",
+    "pluginAdded": "已新增外掛「{{name}}」",
+    "pluginRemoved": "已移除外掛「{{name}}」",
+    "pluginUpdated": "已更新外掛「{{name}}」",
+    "allPluginsUpdated": "已更新所有外掛"
   },
   "versions": {
     "title": "版本",
@@ -69,7 +73,11 @@
     "installLatest": "安裝最新版",
     "latestVersions": "最新版本",
     "installing": "安裝中...",
-    "current": "目前使用"
+    "current": "目前使用",
+    "versionInstalled": "已安裝 {{name}}@{{version}}",
+    "versionUninstalled": "已解除安裝 {{name}}@{{version}}",
+    "versionSet": "已將 {{name}} 設為 {{version}}（{{scope}}）",
+    "installFailed": "安裝 {{name}}@{{version}} 失敗"
   },
   "toolVersions": {
     "title": ".tool-versions",
@@ -81,7 +89,8 @@
     "validation": {
       "pluginNotInstalled": "外掛未安裝",
       "versionNotInstalled": "版本未安裝"
-    }
+    },
+    "fileSaved": "已儲存 {{path}}"
   },
   "shims": {
     "title": "Shims",
@@ -91,7 +100,8 @@
     "providedBy": "提供者",
     "reshim": "重建 Shim",
     "selectPlugin": "選擇外掛",
-    "selectVersion": "選擇版本"
+    "selectVersion": "選擇版本",
+    "reshimSuccess": "已重建 {{name}}@{{version}} 的 Shim"
   },
   "info": {
     "title": "資訊",

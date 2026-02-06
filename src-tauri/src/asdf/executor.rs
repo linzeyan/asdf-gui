@@ -8,10 +8,11 @@ use crate::error::AppError;
 use crate::types::InstallEvent;
 
 #[derive(Debug)]
-#[allow(dead_code)]
 pub struct CommandOutput {
     pub stdout: String,
+    #[allow(dead_code)]
     pub stderr: String,
+    #[allow(dead_code)]
     pub exit_code: i32,
 }
 

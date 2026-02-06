@@ -3,6 +3,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::config::app_config;
 use crate::config::app_config::{AppConfig, RecentProject};
+use crate::config::context::MAX_RECENT_PROJECTS;
 use crate::error::AppError;
 
 #[tauri::command]
@@ -41,7 +42,7 @@ pub async fn set_working_directory(path: String) -> Result<AppConfig, AppError> 
             last_opened: now,
         },
     );
-    config.recent_projects.truncate(10);
+    config.recent_projects.truncate(MAX_RECENT_PROJECTS);
 
     app_config::write_config(&config)?;
     Ok(config)

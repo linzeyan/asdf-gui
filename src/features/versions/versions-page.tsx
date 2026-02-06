@@ -14,6 +14,7 @@ import { InstalledVersions } from "./installed-versions";
 import { AvailableVersions } from "./available-versions";
 import { InstallProgress } from "./install-progress";
 import { LatestVersions } from "./latest-versions";
+import { useVersionActions } from "./use-version-actions";
 import { useAppStore } from "@/stores/app-store";
 import * as commands from "@/lib/commands";
 import type { Plugin, LatestInfo } from "@/lib/types";
@@ -36,7 +37,6 @@ export function VersionsPage() {
   const [currentVersion, setCurrentVersion] = useState<string | null>(null);
   const [installedLoading, setInstalledLoading] = useState(false);
   const [availableLoading, setAvailableLoading] = useState(false);
-  const [actionKey, setActionKey] = useState<string | null>(null);
 
   // Install progress
   const [installTarget, setInstallTarget] = useState<{
@@ -103,59 +103,14 @@ export function VersionsPage() {
     loadPluginData(selectedPlugin);
   }, [selectedPlugin, loadPluginData]);
 
+  // Version action handlers (set local/global, uninstall, show path)
+  const { actionKey, handleSetVersion, handleUninstall, handleShowPath } =
+    useVersionActions(selectedPlugin, loadPluginData);
+
   function handleSelectPlugin(name: string) {
     setSelectedPlugin(name);
     setSearchParams({ plugin: name });
     setInstallTarget(null);
-  }
-
-  async function handleSetLocal(version: string) {
-    setActionKey(`local:${version}`);
-    try {
-      await commands.setVersion(selectedPlugin, [version], "Local");
-      toast.success(`${selectedPlugin} set to ${version} (local)`);
-      await loadPluginData(selectedPlugin);
-    } catch (e) {
-      toast.error(String(e));
-    } finally {
-      setActionKey(null);
-    }
-  }
-
-  async function handleSetGlobal(version: string) {
-    setActionKey(`global:${version}`);
-    try {
-      await commands.setVersion(selectedPlugin, [version], "Home");
-      toast.success(`${selectedPlugin} set to ${version} (global)`);
-      await loadPluginData(selectedPlugin);
-    } catch (e) {
-      toast.error(String(e));
-    } finally {
-      setActionKey(null);
-    }
-  }
-
-  async function handleUninstall(version: string) {
-    setActionKey(`uninstall:${version}`);
-    try {
-      await commands.uninstallVersion(selectedPlugin, version);
-      toast.success(`${selectedPlugin}@${version} uninstalled`);
-      await loadPluginData(selectedPlugin);
-      await refreshStatus();
-    } catch (e) {
-      toast.error(String(e));
-    } finally {
-      setActionKey(null);
-    }
-  }
-
-  async function handleShowPath(version: string) {
-    try {
-      const path = await commands.whereInstalled(selectedPlugin, version);
-      toast.info(path);
-    } catch (e) {
-      toast.error(String(e));
-    }
   }
 
   function handleInstall(version: string) {
@@ -172,7 +127,9 @@ export function VersionsPage() {
         } else if ("Finished" in event) {
           setIsInstalling(false);
           if (event.Finished.success) {
-            toast.success(`${selectedPlugin}@${version} installed`);
+            toast.success(
+              t("versions.versionInstalled", { name: selectedPlugin, version }),
+            );
             loadPluginData(selectedPlugin);
             refreshStatus();
             // Refresh latest overview
@@ -181,7 +138,9 @@ export function VersionsPage() {
               .then(setLatestData)
               .catch(() => {});
           } else {
-            toast.error(`Installation failed for ${selectedPlugin}@${version}`);
+            toast.error(
+              t("versions.installFailed", { name: selectedPlugin, version }),
+            );
           }
         }
       })
@@ -197,7 +156,7 @@ export function VersionsPage() {
     setLatestInstallingKey(key);
     try {
       await commands.installVersion(name, version, false, null, () => {});
-      toast.success(`${name}@${version} installed`);
+      toast.success(t("versions.versionInstalled", { name, version }));
       // Refresh latest data
       const updated = await commands.latestAll().catch(() => []);
       setLatestData(updated);
@@ -262,8 +221,8 @@ export function VersionsPage() {
                 versions={installed}
                 currentVersion={currentVersion}
                 isLoading={installedLoading}
-                onSetLocal={handleSetLocal}
-                onSetGlobal={handleSetGlobal}
+                onSetLocal={(v) => handleSetVersion(v, "Local")}
+                onSetGlobal={(v) => handleSetVersion(v, "Home")}
                 onUninstall={handleUninstall}
                 onShowPath={handleShowPath}
                 actionKey={actionKey}

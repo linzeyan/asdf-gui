@@ -167,6 +167,55 @@ pub fn parse_tool_versions(content: &str) -> Vec<ToolVersion> {
         .collect()
 }
 
+/// Parse `asdf info` output.
+/// Multi-line format with labeled sections.
+pub fn parse_asdf_info(stdout: &str) -> Result<AsdfInfo, AppError> {
+    let mut version = String::new();
+    let mut os = String::new();
+    let mut shell = String::new();
+    let mut asdf_dir = String::new();
+    let mut asdf_data_dir = String::new();
+    let mut plugins = Vec::new();
+
+    let mut in_plugins = false;
+
+    for line in stdout.lines() {
+        let line = line.trim();
+
+        if let Some(val) = line.strip_prefix("ASDF VERSION:") {
+            version = val.trim().to_string();
+            in_plugins = false;
+        } else if let Some(val) = line.strip_prefix("OS:") {
+            os = val.trim().to_string();
+            in_plugins = false;
+        } else if let Some(val) = line.strip_prefix("SHELL:") {
+            shell = val.trim().to_string();
+            in_plugins = false;
+        } else if let Some(val) = line.strip_prefix("ASDF DIR:") {
+            asdf_dir = val.trim().to_string();
+            in_plugins = false;
+        } else if let Some(val) = line.strip_prefix("ASDF DATA DIR:") {
+            asdf_data_dir = val.trim().to_string();
+            in_plugins = false;
+        } else if line.starts_with("ASDF INSTALLED PLUGINS:") {
+            in_plugins = true;
+        } else if in_plugins && !line.is_empty() {
+            plugins.push(line.to_string());
+        } else if line.is_empty() {
+            in_plugins = false;
+        }
+    }
+
+    Ok(AsdfInfo {
+        version,
+        os,
+        shell,
+        asdf_dir,
+        asdf_data_dir,
+        plugins,
+    })
+}
+
 /// Parse `asdf env <command>` output.
 /// Each line: `KEY=value`.
 pub fn parse_env(stdout: &str) -> Vec<EnvVar> {
@@ -316,5 +365,24 @@ mod tests {
         assert_eq!(result.len(), 1);
         assert_eq!(result[0].key, "FOO");
         assert_eq!(result[0].value, "bar=baz");
+    }
+
+    #[test]
+    fn test_parse_asdf_info() {
+        let input = "ASDF VERSION: 0.14.0\nOS: linux\nSHELL: /bin/bash\nASDF DIR: /home/user/.asdf\nASDF DATA DIR: /home/user/.asdf\n\nASDF INSTALLED PLUGINS:\nnodejs\npython\n";
+        let result = parse_asdf_info(input).unwrap();
+        assert_eq!(result.version, "0.14.0");
+        assert_eq!(result.os, "linux");
+        assert_eq!(result.shell, "/bin/bash");
+        assert_eq!(result.asdf_dir, "/home/user/.asdf");
+        assert_eq!(result.asdf_data_dir, "/home/user/.asdf");
+        assert_eq!(result.plugins, vec!["nodejs", "python"]);
+    }
+
+    #[test]
+    fn test_parse_asdf_info_empty() {
+        let result = parse_asdf_info("").unwrap();
+        assert!(result.version.is_empty());
+        assert!(result.plugins.is_empty());
     }
 }

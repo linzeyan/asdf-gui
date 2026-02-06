@@ -7,19 +7,7 @@ import { ErrorBoundary } from "@/components/shared/error-boundary";
 import { AsdfNotFound } from "@/components/shared/asdf-not-found";
 import { useAppStore } from "@/stores/app-store";
 import { useSettingsStore } from "@/stores/settings-store";
-
-function applyTheme(theme: string) {
-  if (theme === "dark") {
-    document.documentElement.classList.add("dark");
-  } else if (theme === "light") {
-    document.documentElement.classList.remove("dark");
-  } else {
-    const prefersDark = window.matchMedia(
-      "(prefers-color-scheme: dark)",
-    ).matches;
-    document.documentElement.classList.toggle("dark", prefersDark);
-  }
-}
+import { useTheme } from "@/hooks/use-theme";
 
 export function AppLayout() {
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -39,24 +27,7 @@ export function AppLayout() {
     });
   }, [loadSettings, refreshStatus]);
 
-  // Apply theme from settings
-  useEffect(() => {
-    if (config?.theme) {
-      applyTheme(config.theme);
-    }
-  }, [config?.theme]);
-
-  // Listen for system theme changes when using "system" theme
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const handler = () => {
-      if (!config?.theme || config.theme === "system") {
-        document.documentElement.classList.toggle("dark", mq.matches);
-      }
-    };
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, [config?.theme]);
+  useTheme(config?.theme);
 
   // Sync working directory from settings on initial load
   useEffect(() => {

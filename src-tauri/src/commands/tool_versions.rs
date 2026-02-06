@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use crate::asdf::parser;
-use crate::config::app_config;
+use crate::config::context::ConfigContext;
 use crate::error::AppError;
 use crate::types::{SetScope, ToolVersion};
 
@@ -29,7 +29,7 @@ pub async fn write_tool_versions(path: String, entries: Vec<ToolVersion>) -> Res
 
 #[tauri::command]
 pub async fn get_tool_versions_path(scope: SetScope) -> Result<String, AppError> {
-    let config = app_config::read_config().ok();
+    let ctx = ConfigContext::load();
 
     match scope {
         SetScope::Home => {
@@ -39,24 +39,14 @@ pub async fn get_tool_versions_path(scope: SetScope) -> Result<String, AppError>
             Ok(home.join(".tool-versions").to_string_lossy().to_string())
         }
         SetScope::Local => {
-            let cwd = config.and_then(|c| c.working_directory).unwrap_or_else(|| {
-                dirs::home_dir()
-                    .unwrap_or_default()
-                    .to_string_lossy()
-                    .to_string()
-            });
+            let cwd = ctx.cwd_or_home();
             Ok(PathBuf::from(cwd)
                 .join(".tool-versions")
                 .to_string_lossy()
                 .to_string())
         }
         SetScope::Parent => {
-            let cwd = config.and_then(|c| c.working_directory).unwrap_or_else(|| {
-                dirs::home_dir()
-                    .unwrap_or_default()
-                    .to_string_lossy()
-                    .to_string()
-            });
+            let cwd = ctx.cwd_or_home();
 
             // Walk up directories to find closest .tool-versions
             let mut dir = PathBuf::from(&cwd);

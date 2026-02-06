@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { InstalledPlugins } from "./installed-plugins";
 import { AddPluginDialog } from "./add-plugin-dialog";
 import { useAppStore } from "@/stores/app-store";
+import { useAddPlugin } from "@/hooks/use-add-plugin";
 import * as commands from "@/lib/commands";
-import type { Plugin, PluginRegistry } from "@/lib/types";
+import type { Plugin } from "@/lib/types";
 
 export function PluginsPage() {
   const { t } = useTranslation();
@@ -20,11 +21,6 @@ export function PluginsPage() {
   const [removingKey, setRemovingKey] = useState<string | null>(null);
   const [updatingKey, setUpdatingKey] = useState<string | null>(null);
   const [updatingAll, setUpdatingAll] = useState(false);
-
-  // Add Plugin dialog
-  const [showAddPlugin, setShowAddPlugin] = useState(false);
-  const [registry, setRegistry] = useState<PluginRegistry[]>([]);
-  const [registryLoading, setRegistryLoading] = useState(false);
 
   const loadPlugins = useCallback(async () => {
     try {
@@ -41,11 +37,26 @@ export function PluginsPage() {
     loadPlugins();
   }, [loadPlugins]);
 
+  const {
+    showAddPlugin,
+    setShowAddPlugin,
+    registry,
+    registryLoading,
+    openAddPlugin,
+    addPlugin,
+  } = useAddPlugin({
+    onSuccess: async (name) => {
+      toast.success(t("plugins.pluginAdded", { name }));
+      await loadPlugins();
+      await refreshStatus();
+    },
+  });
+
   async function handleRemove(name: string) {
     setRemovingKey(name);
     try {
       await commands.pluginRemove(name);
-      toast.success(`Plugin "${name}" removed`);
+      toast.success(t("plugins.pluginRemoved", { name }));
       await loadPlugins();
       await refreshStatus();
     } catch (e) {
@@ -59,7 +70,7 @@ export function PluginsPage() {
     setUpdatingKey(name);
     try {
       await commands.pluginUpdate(name);
-      toast.success(`Plugin "${name}" updated`);
+      toast.success(t("plugins.pluginUpdated", { name }));
       await loadPlugins();
     } catch (e) {
       toast.error(t("errors.commandFailed", { message: String(e) }));
@@ -72,7 +83,7 @@ export function PluginsPage() {
     setUpdatingAll(true);
     try {
       await commands.pluginUpdate(undefined, true);
-      toast.success("All plugins updated");
+      toast.success(t("plugins.allPluginsUpdated"));
       await loadPlugins();
     } catch (e) {
       toast.error(t("errors.commandFailed", { message: String(e) }));
@@ -83,28 +94,6 @@ export function PluginsPage() {
 
   function handleViewVersions(name: string) {
     navigate(`/versions?plugin=${encodeURIComponent(name)}`);
-  }
-
-  async function handleOpenAddPlugin() {
-    setShowAddPlugin(true);
-    if (registry.length === 0) {
-      setRegistryLoading(true);
-      try {
-        const all = await commands.pluginListAll();
-        setRegistry(all);
-      } catch {
-        // registry will be empty
-      } finally {
-        setRegistryLoading(false);
-      }
-    }
-  }
-
-  async function handleAddPlugin(name: string, gitUrl?: string) {
-    await commands.pluginAdd(name, gitUrl);
-    toast.success(`Plugin "${name}" added`);
-    await loadPlugins();
-    await refreshStatus();
   }
 
   return (
@@ -125,7 +114,7 @@ export function PluginsPage() {
             )}
             {t("plugins.updateAll")}
           </Button>
-          <Button size="sm" onClick={handleOpenAddPlugin}>
+          <Button size="sm" onClick={openAddPlugin}>
             <Plus className="mr-1.5 size-3.5" />
             {t("plugins.addPlugin")}
           </Button>
@@ -147,7 +136,7 @@ export function PluginsPage() {
         onOpenChange={setShowAddPlugin}
         registry={registry}
         registryLoading={registryLoading}
-        onAdd={handleAddPlugin}
+        onAdd={addPlugin}
       />
     </div>
   );

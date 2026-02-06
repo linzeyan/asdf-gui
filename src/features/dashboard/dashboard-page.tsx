@@ -6,8 +6,9 @@ import { CurrentVersionsTable } from "./current-versions-table";
 import { QuickActions } from "./quick-actions";
 import { AddPluginDialog } from "@/features/plugins/add-plugin-dialog";
 import { useAppStore } from "@/stores/app-store";
+import { useAddPlugin } from "@/hooks/use-add-plugin";
 import * as commands from "@/lib/commands";
-import type { CurrentVersion, AsdfInfo, PluginRegistry } from "@/lib/types";
+import type { CurrentVersion, AsdfInfo } from "@/lib/types";
 
 export function DashboardPage() {
   const { t } = useTranslation();
@@ -18,11 +19,6 @@ export function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [installingKey, setInstallingKey] = useState<string | null>(null);
-
-  // Add Plugin dialog state
-  const [showAddPlugin, setShowAddPlugin] = useState(false);
-  const [registry, setRegistry] = useState<PluginRegistry[]>([]);
-  const [registryLoading, setRegistryLoading] = useState(false);
 
   const loadData = useCallback(async () => {
     try {
@@ -41,6 +37,21 @@ export function DashboardPage() {
     loadData();
   }, [loadData]);
 
+  const {
+    showAddPlugin,
+    setShowAddPlugin,
+    registry,
+    registryLoading,
+    openAddPlugin,
+    addPlugin,
+  } = useAddPlugin({
+    onSuccess: async (name) => {
+      toast.success(t("plugins.pluginAdded", { name }));
+      await refreshStatus();
+      await loadData();
+    },
+  });
+
   async function handleRefresh() {
     setIsRefreshing(true);
     try {
@@ -56,7 +67,7 @@ export function DashboardPage() {
     setInstallingKey(key);
     try {
       await commands.installVersion(name, version, false, null, () => {});
-      toast.success(`${name}@${version} installed`);
+      toast.success(t("versions.versionInstalled", { name, version }));
       await loadData();
       await refreshStatus();
     } catch (e) {
@@ -73,28 +84,6 @@ export function DashboardPage() {
     }
   }
 
-  async function handleOpenAddPlugin() {
-    setShowAddPlugin(true);
-    if (registry.length === 0) {
-      setRegistryLoading(true);
-      try {
-        const all = await commands.pluginListAll();
-        setRegistry(all);
-      } catch {
-        // ignore — registry will just be empty
-      } finally {
-        setRegistryLoading(false);
-      }
-    }
-  }
-
-  async function handleAddPlugin(name: string, gitUrl?: string) {
-    await commands.pluginAdd(name, gitUrl);
-    toast.success(`Plugin "${name}" added`);
-    await refreshStatus();
-    await loadData();
-  }
-
   const hasUninstalled = versions.some((v) => !v.installed);
   const totalVersions = info?.plugins.length ?? pluginCount;
 
@@ -104,7 +93,7 @@ export function DashboardPage() {
         <h1 className="text-2xl font-semibold">{t("dashboard.title")}</h1>
         <QuickActions
           onInstallAll={handleInstallAll}
-          onAddPlugin={handleOpenAddPlugin}
+          onAddPlugin={openAddPlugin}
           onRefresh={handleRefresh}
           isRefreshing={isRefreshing}
           hasUninstalled={hasUninstalled}
@@ -130,7 +119,7 @@ export function DashboardPage() {
         onOpenChange={setShowAddPlugin}
         registry={registry}
         registryLoading={registryLoading}
-        onAdd={handleAddPlugin}
+        onAdd={addPlugin}
       />
     </div>
   );

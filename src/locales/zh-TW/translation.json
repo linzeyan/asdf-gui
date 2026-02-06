@@ -1,0 +1,133 @@
+{
+  "common": {
+    "loading": "載入中...",
+    "error": "錯誤",
+    "save": "儲存",
+    "cancel": "取消",
+    "confirm": "確認",
+    "delete": "刪除",
+    "refresh": "重新整理",
+    "search": "搜尋...",
+    "copyToClipboard": "複製到剪貼簿",
+    "copied": "已複製！",
+    "install": "安裝",
+    "uninstall": "解除安裝",
+    "update": "更新",
+    "remove": "移除",
+    "add": "新增",
+    "close": "關閉",
+    "browse": "瀏覽...",
+    "notInstalled": "未安裝",
+    "upToDate": "已是最新",
+    "updateAvailable": "有可用更新"
+  },
+  "sidebar": {
+    "dashboard": "總覽",
+    "plugins": "外掛",
+    "versions": "版本",
+    "toolVersions": ".tool-versions",
+    "shims": "Shims",
+    "info": "資訊",
+    "settings": "設定",
+    "selectProject": "選擇專案"
+  },
+  "statusBar": {
+    "pluginCount": "{{count}} 個外掛",
+    "clickToChangeDir": "點擊以變更目錄"
+  },
+  "dashboard": {
+    "title": "總覽",
+    "asdfVersion": "asdf 版本",
+    "dataDir": "資料目錄",
+    "pluginCount": "已安裝外掛",
+    "totalVersions": "版本總數",
+    "currentVersions": "目前版本",
+    "installAll": "全部安裝",
+    "addPlugin": "新增外掛",
+    "noPlugins": "尚未安裝任何外掛。新增一個外掛來開始使用。"
+  },
+  "plugins": {
+    "title": "外掛",
+    "installed": "已安裝外掛",
+    "addPlugin": "新增外掛",
+    "fromRegistry": "從登錄檔",
+    "customUrl": "自訂 URL",
+    "pluginName": "外掛名稱",
+    "gitUrl": "Git URL",
+    "updateAll": "全部更新",
+    "removeConfirm": "確定要移除外掛「{{name}}」嗎？這也會移除所有已安裝的版本。",
+    "viewVersions": "檢視版本"
+  },
+  "versions": {
+    "title": "版本",
+    "selectPlugin": "選擇外掛",
+    "installed": "已安裝版本",
+    "available": "可用版本",
+    "setLocal": "設為本地",
+    "setGlobal": "設為全域",
+    "showPath": "顯示路徑",
+    "installLatest": "安裝最新版",
+    "latestVersions": "最新版本",
+    "installing": "安裝中...",
+    "current": "目前使用"
+  },
+  "toolVersions": {
+    "title": ".tool-versions",
+    "local": "本地",
+    "global": "全域",
+    "custom": "自訂路徑",
+    "addRow": "新增工具",
+    "fileNotFound": "找不到檔案。點擊「新增工具」來建立。",
+    "validation": {
+      "pluginNotInstalled": "外掛未安裝",
+      "versionNotInstalled": "版本未安裝"
+    }
+  },
+  "shims": {
+    "title": "Shims",
+    "lookup": "Shim 查詢",
+    "commandName": "指令名稱",
+    "resolvedPath": "解析路徑",
+    "providedBy": "提供者",
+    "reshim": "重建 Shim",
+    "selectPlugin": "選擇外掛",
+    "selectVersion": "選擇版本"
+  },
+  "info": {
+    "title": "資訊",
+    "systemInfo": "系統資訊",
+    "envInspector": "環境變數檢視",
+    "commandName": "指令名稱",
+    "envVars": "環境變數"
+  },
+  "settings": {
+    "title": "設定",
+    "general": "一般",
+    "language": "語言",
+    "theme": "主題",
+    "themeLight": "淺色",
+    "themeDark": "深色",
+    "themeSystem": "跟隨系統",
+    "asdfBinaryPath": "asdf 執行檔路徑",
+    "asdfBinaryPathDesc": "覆蓋 asdf 執行檔的路徑。留空則自動偵測。",
+    "workingDirectory": "工作目錄",
+    "keepDownloads": "保留下載檔案",
+    "keepDownloadsDesc": "安裝後保留已下載的原始碼。",
+    "notifications": "桌面通知",
+    "notificationsDesc": "操作完成時顯示桌面通知。",
+    "asdfrc": ".asdfrc 設定",
+    "asdfrcEmpty": "找不到 .asdfrc 檔案。"
+  },
+  "projectPicker": {
+    "title": "選擇專案",
+    "recentProjects": "最近的專案",
+    "noRecent": "沒有最近的專案",
+    "browseFolder": "瀏覽資料夾"
+  },
+  "errors": {
+    "asdfNotFound": "找不到 asdf",
+    "asdfNotFoundDesc": "請安裝 asdf 或在設定中指定執行檔路徑。",
+    "commandFailed": "指令執行失敗：{{message}}",
+    "goToSettings": "前往設定"
+  }
+}

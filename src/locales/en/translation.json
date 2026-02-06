@@ -1,0 +1,133 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "refresh": "Refresh",
+    "search": "Search...",
+    "copyToClipboard": "Copy to Clipboard",
+    "copied": "Copied!",
+    "install": "Install",
+    "uninstall": "Uninstall",
+    "update": "Update",
+    "remove": "Remove",
+    "add": "Add",
+    "close": "Close",
+    "browse": "Browse...",
+    "notInstalled": "Not Installed",
+    "upToDate": "Up to date",
+    "updateAvailable": "Update available"
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "plugins": "Plugins",
+    "versions": "Versions",
+    "toolVersions": ".tool-versions",
+    "shims": "Shims",
+    "info": "Info",
+    "settings": "Settings",
+    "selectProject": "Select Project"
+  },
+  "statusBar": {
+    "pluginCount": "{{count}} plugins",
+    "clickToChangeDir": "Click to change directory"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "asdfVersion": "asdf Version",
+    "dataDir": "Data Directory",
+    "pluginCount": "Installed Plugins",
+    "totalVersions": "Total Versions",
+    "currentVersions": "Current Versions",
+    "installAll": "Install All",
+    "addPlugin": "Add Plugin",
+    "noPlugins": "No plugins installed. Add a plugin to get started."
+  },
+  "plugins": {
+    "title": "Plugins",
+    "installed": "Installed Plugins",
+    "addPlugin": "Add Plugin",
+    "fromRegistry": "From Registry",
+    "customUrl": "Custom URL",
+    "pluginName": "Plugin Name",
+    "gitUrl": "Git URL",
+    "updateAll": "Update All",
+    "removeConfirm": "Are you sure you want to remove the plugin \"{{name}}\"? This will also remove all installed versions.",
+    "viewVersions": "View Versions"
+  },
+  "versions": {
+    "title": "Versions",
+    "selectPlugin": "Select a plugin",
+    "installed": "Installed Versions",
+    "available": "Available Versions",
+    "setLocal": "Set Local",
+    "setGlobal": "Set Global",
+    "showPath": "Show Path",
+    "installLatest": "Install Latest",
+    "latestVersions": "Latest Versions",
+    "installing": "Installing...",
+    "current": "Current"
+  },
+  "toolVersions": {
+    "title": ".tool-versions",
+    "local": "Local",
+    "global": "Global",
+    "custom": "Custom Path",
+    "addRow": "Add Tool",
+    "fileNotFound": "File not found. Click \"Add Tool\" to create one.",
+    "validation": {
+      "pluginNotInstalled": "Plugin not installed",
+      "versionNotInstalled": "Version not installed"
+    }
+  },
+  "shims": {
+    "title": "Shims",
+    "lookup": "Shim Lookup",
+    "commandName": "Command name",
+    "resolvedPath": "Resolved Path",
+    "providedBy": "Provided By",
+    "reshim": "Reshim",
+    "selectPlugin": "Select plugin",
+    "selectVersion": "Select version"
+  },
+  "info": {
+    "title": "Info",
+    "systemInfo": "System Info",
+    "envInspector": "Environment Inspector",
+    "commandName": "Command name",
+    "envVars": "Environment Variables"
+  },
+  "settings": {
+    "title": "Settings",
+    "general": "General",
+    "language": "Language",
+    "theme": "Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "System",
+    "asdfBinaryPath": "asdf Binary Path",
+    "asdfBinaryPathDesc": "Override the path to the asdf binary. Leave empty to auto-detect.",
+    "workingDirectory": "Working Directory",
+    "keepDownloads": "Keep Downloads",
+    "keepDownloadsDesc": "Always keep downloaded sources after installing.",
+    "notifications": "Desktop Notifications",
+    "notificationsDesc": "Show desktop notifications when operations complete.",
+    "asdfrc": ".asdfrc Configuration",
+    "asdfrcEmpty": "No .asdfrc file found."
+  },
+  "projectPicker": {
+    "title": "Select Project",
+    "recentProjects": "Recent Projects",
+    "noRecent": "No recent projects",
+    "browseFolder": "Browse Folder"
+  },
+  "errors": {
+    "asdfNotFound": "asdf not found",
+    "asdfNotFoundDesc": "Please install asdf or configure the binary path in Settings.",
+    "commandFailed": "Command failed: {{message}}",
+    "goToSettings": "Go to Settings"
+  }
+}

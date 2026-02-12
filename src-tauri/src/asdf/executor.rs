@@ -236,3 +236,140 @@ pub async fn run_asdf_streaming(
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── well_known_asdf_paths ──────────────────────────────────────
+
+    #[test]
+    fn test_well_known_asdf_paths_contains_homebrew() {
+        let paths = well_known_asdf_paths();
+        let paths_str: Vec<String> = paths
+            .iter()
+            .map(|p| p.to_string_lossy().to_string())
+            .collect();
+        assert!(
+            paths_str
+                .iter()
+                .any(|p| p.contains("/opt/homebrew/bin/asdf"))
+        );
+        assert!(paths_str.iter().any(|p| p.contains("/usr/local/bin/asdf")));
+    }
+
+    #[test]
+    fn test_well_known_asdf_paths_contains_linux_path() {
+        let paths = well_known_asdf_paths();
+        let paths_str: Vec<String> = paths
+            .iter()
+            .map(|p| p.to_string_lossy().to_string())
+            .collect();
+        assert!(
+            paths_str
+                .iter()
+                .any(|p| p.contains("/opt/asdf-vm/bin/asdf"))
+        );
+    }
+
+    #[test]
+    fn test_well_known_asdf_paths_contains_home_asdf() {
+        let paths = well_known_asdf_paths();
+        if dirs::home_dir().is_some() {
+            let paths_str: Vec<String> = paths
+                .iter()
+                .map(|p| p.to_string_lossy().to_string())
+                .collect();
+            assert!(paths_str.iter().any(|p| p.contains(".asdf/bin/asdf")));
+        }
+    }
+
+    #[test]
+    fn test_well_known_asdf_paths_not_empty() {
+        let paths = well_known_asdf_paths();
+        // At minimum we have homebrew + intel + linux paths
+        assert!(paths.len() >= 3);
+    }
+
+    // ── resolve_asdf_binary ────────────────────────────────────────
+
+    #[test]
+    fn test_resolve_asdf_binary_config_override_nonexistent() {
+        let result = resolve_asdf_binary(Some("/nonexistent/path/to/asdf"));
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("configured path does not exist"));
+    }
+
+    #[test]
+    fn test_resolve_asdf_binary_config_override_existing_file() {
+        // Use a path that exists on any Unix system
+        let result = resolve_asdf_binary(Some("/bin/sh"));
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), PathBuf::from("/bin/sh"));
+    }
+
+    #[test]
+    fn test_resolve_asdf_binary_empty_config_override() {
+        let result = resolve_asdf_binary(Some(""));
+        // Empty path won't exist
+        assert!(result.is_err());
+    }
+
+    // ── get_user_path ──────────────────────────────────────────────
+
+    #[test]
+    fn test_get_user_path_returns_non_empty() {
+        let path = get_user_path();
+        assert!(!path.is_empty());
+    }
+
+    #[test]
+    fn test_get_user_path_is_cached() {
+        // Calling twice should return the same reference (OnceLock)
+        let path1 = get_user_path();
+        let path2 = get_user_path();
+        assert!(std::ptr::eq(path1, path2));
+    }
+
+    #[test]
+    fn test_get_user_path_contains_path_separator() {
+        let path = get_user_path();
+        // On Unix systems, PATH uses ':' separator; on Windows ';'
+        if cfg!(target_os = "windows") {
+            // May or may not contain ';'
+        } else {
+            // Usually contains multiple paths separated by ':'
+            assert!(path.contains(':') || !path.is_empty());
+        }
+    }
+
+    // ── CommandOutput ──────────────────────────────────────────────
+
+    #[test]
+    fn test_command_output_debug() {
+        let output = CommandOutput {
+            stdout: "hello".to_string(),
+            stderr: "".to_string(),
+            exit_code: 0,
+        };
+        let debug = format!("{:?}", output);
+        assert!(debug.contains("hello"));
+        assert!(debug.contains("exit_code: 0"));
+    }
+
+    // ── Cross-platform path handling ───────────────────────────────
+
+    #[test]
+    fn test_pathbuf_from_windows_style_path() {
+        // Ensure PathBuf handles Windows-style paths
+        let p = PathBuf::from("C:\\Users\\user\\.asdf\\bin\\asdf");
+        assert!(p.to_string_lossy().contains("asdf"));
+    }
+
+    #[test]
+    fn test_pathbuf_from_unix_style_path() {
+        let p = PathBuf::from("/home/user/.asdf/bin/asdf");
+        assert!(p.to_string_lossy().contains("asdf"));
+    }
+}

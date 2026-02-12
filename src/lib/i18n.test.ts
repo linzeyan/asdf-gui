@@ -41,6 +41,80 @@ describe("i18n", () => {
       [],
     );
   });
+
+  // ── Additional i18n tests ──────────────────────────────────────
+
+  it("has at least one translation key", () => {
+    expect(enKeys.length).toBeGreaterThan(0);
+    expect(zhKeys.length).toBeGreaterThan(0);
+  });
+
+  it("en and zh-TW have the same number of keys", () => {
+    expect(enKeys.length).toBe(zhKeys.length);
+  });
+
+  it("all en values are strings", () => {
+    const enValues = flattenValues(en);
+    for (const [key, value] of enValues) {
+      expect(typeof value, `Key ${key} should be string`).toBe("string");
+    }
+  });
+
+  it("all zh-TW values are strings", () => {
+    const zhValues = flattenValues(zhTW);
+    for (const [key, value] of zhValues) {
+      expect(typeof value, `Key ${key} should be string`).toBe("string");
+    }
+  });
+
+  it("en values do not contain raw HTML tags (security)", () => {
+    const enValues = flattenValues(en);
+    const htmlPattern = /<script|<iframe|onclick|onerror/i;
+    for (const [key, value] of enValues) {
+      expect(
+        htmlPattern.test(value),
+        `Key ${key} contains potentially dangerous HTML`,
+      ).toBe(false);
+    }
+  });
+
+  it("zh-TW values do not contain raw HTML tags (security)", () => {
+    const zhValues = flattenValues(zhTW);
+    const htmlPattern = /<script|<iframe|onclick|onerror/i;
+    for (const [key, value] of zhValues) {
+      expect(
+        htmlPattern.test(value),
+        `Key ${key} contains potentially dangerous HTML`,
+      ).toBe(false);
+    }
+  });
+
+  it("sidebar keys exist in both languages", () => {
+    const sidebarKeys = enKeys.filter((k) => k.startsWith("sidebar."));
+    expect(sidebarKeys.length).toBeGreaterThan(0);
+    for (const key of sidebarKeys) {
+      expect(zhKeys, `sidebar key ${key} missing in zh-TW`).toContain(key);
+    }
+  });
+
+  it("error keys exist in both languages", () => {
+    const errorKeys = enKeys.filter((k) => k.startsWith("errors."));
+    expect(errorKeys.length).toBeGreaterThan(0);
+    for (const key of errorKeys) {
+      expect(zhKeys, `error key ${key} missing in zh-TW`).toContain(key);
+    }
+  });
+
+  it("no translation value has only whitespace", () => {
+    const enValues = flattenValues(en);
+    const whitespaceOnly = enValues.filter(
+      ([, v]) => v.length > 0 && v.trim() === "",
+    );
+    expect(
+      whitespaceOnly,
+      `Whitespace-only values: ${whitespaceOnly.map(([k]) => k).join(", ")}`,
+    ).toEqual([]);
+  });
 });
 
 function flattenValues(
